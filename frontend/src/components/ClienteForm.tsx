@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {StyledFormContainer, StyledForm, StyledFormGroup, StyledLabel, StyledTitle, ClientsList,} from "../styles/FormStyles";
+import {
+  StyledFormContainer,
+  StyledForm,
+  StyledFormGroup,
+  StyledLabel,
+  StyledTitle,
+  ClientsList,
+  ButtonContainer,
+} from "../styles/FormStyles";
 import Input from "./Input";
 import Button from "./Button";
 import ClienteBox from "./ClienteBox";
 import { Clientes } from "../types";
+import ButtonUpdate from "./ButtonUpdate";
 
 const ClienteForm: React.FC = () => {
   const [clientes, setClientes] = useState<Clientes[]>([]);
@@ -11,6 +20,7 @@ const ClienteForm: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [idade, setIdade] = useState<number | undefined>(undefined);
   const [fone, setFone] = useState<string>("");
+  const [clienteId, setClienteId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,11 +48,40 @@ const ClienteForm: React.FC = () => {
     }
   };
 
+  const handleUpdate = async () => {
+    if (clienteId && nome && email) {
+      const clienteAtualizado = { nome, email, idade, fone };
+
+      try {
+        const response = await fetch(`http://localhost:3001/cliente/${clienteId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(clienteAtualizado),
+        });
+
+        if (!response.ok) {
+          const errorResponse = await response.json();
+          throw new Error(errorResponse.message || "Erro ao atualizar cliente");
+        }
+
+        const clienteAtualizadoResponse = await response.json();
+        setClientes(clientes.map(cliente =>
+          cliente._id === clienteId ? clienteAtualizadoResponse : cliente
+        ));
+        resetForm();
+        setClienteId(null);
+      } catch (error) {
+        console.error("Erro ao atualizar cliente:", error);
+      }
+    }
+  };
+
   const resetForm = () => {
     setNome("");
     setEmail("");
     setIdade(undefined);
     setFone("");
+    setClienteId(null);
   };
 
   useEffect(() => {
@@ -126,24 +165,41 @@ const ClienteForm: React.FC = () => {
             value={fone}
             onChange={(e) => setFone(e.target.value)}
             required
+            maxLength={11} // Restringindo a 11 caracteres
           />
         </StyledFormGroup>
 
-        <Button type="submit">Cadastrar</Button>
+        <ButtonContainer>
+          <Button type="submit">Cadastrar</Button>
+          <ButtonUpdate
+            type="button"
+            onClick={handleUpdate} // Atualização do cliente
+            disabled={!clienteId} // Desabilita o botão se nenhum cliente estiver selecionado para edição
+          >
+            Atualizar
+          </ButtonUpdate>
+        </ButtonContainer>
 
         <ClientsList>
-        {clientes.map((cliente) => (
-          <ClienteBox
-            key={cliente._id}
-            nome={cliente.nome}
-            email={cliente.email}
-            idade={cliente.idade}
-            fone={cliente.fone}
-            status={cliente.status}
-            onDelete={() => handleDelete(cliente._id)}
-          />
-        ))}
-      </ClientsList>
+          {clientes.map((cliente) => ( // Limitar a dois clientes
+            <ClienteBox
+              key={cliente._id}
+              nome={cliente.nome}
+              email={cliente.email}
+              idade={cliente.idade}
+              fone={cliente.fone}
+              status={cliente.status}
+              onDelete={() => handleDelete(cliente._id)}
+              onEdit={() => {
+                setNome(cliente.nome);
+                setEmail(cliente.email);
+                setIdade(cliente.idade);
+                setFone(cliente.fone);
+                setClienteId(cliente._id);
+              }}
+            />
+          ))}
+        </ClientsList>
       </StyledForm>
     </StyledFormContainer>
   );

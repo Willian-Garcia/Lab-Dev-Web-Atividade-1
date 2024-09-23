@@ -6,6 +6,8 @@ export const StyledFormContainer = styled.div`
   align-items: center;
   height: 100vh;
   background-color: #3a424d;
+  margin-Top: 10px;
+  margin-Bottom: 10px;
 `;
 
 export const StyledForm = styled.form`
@@ -43,4 +45,15 @@ export const ClientsList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 350px;
+  overflow-y: auto;
+  padding: 10px;
+`;
+
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
 `;

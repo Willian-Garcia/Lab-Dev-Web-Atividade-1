@@ -11,15 +11,28 @@ export const BoxContainer = styled.div`
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 `;
 
-export const DeleteButton = styled.button`
+export const IconContainer = styled.div`
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: #f24f45;
+  display: flex;
+  gap: 10px;
+`;
+
+export const DeleteButton = styled.button`
+  background-color: transparent;
   border: none;
-  color: white;
+  color: #f24f45;
   cursor: pointer;
-  font-weight: bold;
+  font-size: 20px;
+`;
+
+export const UpdateButton = styled.button`
+  background-color: transparent;
+  border: none;
+  color: #4caf50;
+  cursor: pointer;
+  font-size: 20px;
 `;
 
 export const InfoText = styled.p`
